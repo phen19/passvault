@@ -2,12 +2,43 @@ import { useContext, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "./UserContext";
 import axios from "axios";
+import styled from "styled-components";
+
 const categorias = [
-    {"wifis":["networkName", "title", "password"], "name": "Wifis", "id": 1}, 
-    {"credentials":["url", "title", "username", "password"], "name": "Credentials", "id": 2}, 
-    {"cards": ["title", "cardHolderName", "number", "securityCode", "expireDate", "password", "isVirtual", "type"], "name":"Cards", "id": 3}, 
-    {"documents":["fullName", "type", "emissionDate", "expireDate", "number", "issuer"], "name": "Documents", "id": 4},
-    {"notes": ["title", "note"],"name":"Notes", "id": 5}
+    {"wifis":[
+        {"fieldName": "networkName", "fieldType": "text", "label": "Nome da Rede"},
+        {"fieldName":"title", "fieldType": "text", "label": "Título"},
+        {"fieldName": "password", "fieldType":"text", "label": "Senha"}
+    ], "name": "Wifis", "id": 1},
+    {"credentials":
+        [
+            {"fieldName": "url", "fieldType": "text", "label": "URL"},
+            {"fieldName": "title", "fieldType": "text", "label": "Título"},
+            {"fieldName": "username", "fieldType": "text", "label": "Nome de usuário" },
+            {"fieldName": "password", "fieldType": "text", "label": "Senha"}
+        ], "name": "Credentials", "id": 2}, 
+    {"cards": [
+        {"fieldName": "title", "fieldType": "text", "label": "Nome do Cartão"},
+        {"fieldName": "cardHolderName", "fieldType": "text", "label": "Titular do Cartão"},
+        {"fieldName": "number", "fieldType": "number", "label": "Número do Cartão"},
+        {"fieldName": "securityCode", "fieldType": "number", "label": "Código de Segurança"},
+        {"fieldName": "expireDate", "fieldType": "date", "label": "Data de Expiração"},
+        {"fieldName": "password", "fieldType": "text", "label": "Senha"},
+        {"fieldName": "isVirtual", "fieldType": "checkbox", "label": "É virtual?"},
+        {"fieldName": "type", "fieldType": "select", "label": "Tipo do cartão"}
+    ], "name":"Cards", "id": 3}, 
+    {"documents":[
+        {"fieldName": "fullName", "fieldType": "text", "label": "Nome Completo"},
+        {"fieldName": "type", "fieldType": "select", "label": "Tipo do Documento"},
+        {"fieldName": "emissionDate", "fieldType": "date", "label": "Data de Emissão"},
+        {"fieldName": "expireDate", "fieldType": "date", "label": "Data de Expiração"},
+        {"fieldName": "number", "fieldType": "number", "label": "Número do Documento"},
+        {"fieldName": "issuer", "fieldType": "text", "label": "Emissor"},
+    ], "name": "Documents", "id": 4},
+    {"notes": [
+        {"fieldName": "title", "fieldType": "text", "label": "Nome"},
+        {"fieldName": "note", "fieldType": "text", "label": "Nota"},
+    ],"name":"Notes", "id": 5}
 ];
 function HomePage() {
     const {user} = useContext(UserContext);
@@ -40,20 +71,64 @@ function HomePage() {
     }
     return (
         <>
-            {categorias.map(categoria => {return (
-                <>
-                {
-                    <div onClick={()=> handleClick(categoria, passwords[categoria.name])}> 
-                    {categoria.name} {passwords[categoria.name] && passwords[categoria.name].length > 0 ? passwords[categoria.name].length : 0}
-                    </div> 
-                }
+            <Container>
+                {categorias.map(categoria => {return (
+                    <>
+                    {
+                        <Categoria onClick={()=> handleClick(categoria, passwords[categoria.name])}> 
+                        <div> {categoria.name} </div>
+                        <div className="qtd">
+                            <p>
+                                {passwords[categoria.name] && passwords[categoria.name].length > 0 ? passwords[categoria.name].length : 0}
+                            </p>
+                        </div>
+                        </Categoria> 
+                    }
 
-                </>
-            )
-            })}
+                    </>
+                )
+                })}
+            </Container>
         </>
     )
 }
+
+const Container = styled.div `
+  background-color: #e7dbc3;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 100px
+`
+
+const Categoria = styled.div `
+    outline: 1px solid rgb(255, 72, 72);
+    width: 25vw;
+    height: 40px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    .qtd:hover{
+        background-color: pink;
+    }
+
+    .qtd{
+        background-color: blue;
+        width: 30px;
+        height: 30px;
+        color: red;
+        border-radius: 50%;
+        display:flex;
+        align-items:center;
+        justify-content: center;
+    }
+`
+
+
 
 export default HomePage
   

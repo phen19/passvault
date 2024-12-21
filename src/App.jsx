@@ -7,6 +7,7 @@ import HomePage from "./HomePage";
 import Passwords from "./Passwords";
 import Password from "./Password";
 import AddNewPassword from "./AddNewPassword";
+import "./assets/reset.css";
 
 function App() {
 
