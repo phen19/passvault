@@ -4,16 +4,25 @@ import { useNavigate } from "react-router-dom";
 import UserContext from "./UserContext";
 import axios from "axios";
 import styled from "styled-components";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import TextField from "@mui/material/TextField";
+import { Button } from "@mui/material";
+import {styled as muiStyled} from "@mui/system"
+import logo from './assets/log.png';
+import API from "./constant";
+
+const StyledTextField = muiStyled(TextField)({
+  marginBottom: '16px',
+})
 
 function SignIn() {
   const {user, setUser } = useContext(UserContext);
   
-  const {register, handleSubmit, formState: {errors}} = useForm();
+  const {control, register, handleSubmit, formState: {errors}} = useForm();
   const navigate = useNavigate();
 
   function sendForm(data){
-    const request = axios.post("http://localhost:5000/signIn", data);
+    const request = axios.post(`${API}/signIn`, data);
     
     request.then((response) => {
       setUser({userId: response.data.userId,token: response.data.token});
@@ -25,31 +34,54 @@ function SignIn() {
   return (
     <>
         <Container>
-          <div className = "logo">
-            PASSVAULT 🔏
-          </div>
+            <Logo> <img src={logo} alt="PASSVAULT Logo" /> </Logo>
             <Form>
-              <input 
-                type="text" 
-                placeholder="E-mail" 
-                className={errors?.email && "input-error"}
-                {...register("email", {required: true})}
-              />
-              {errors?.email?.type === "required" && <p className="error-message"> Email is required</p>}
-              <input 
-                type="password" 
-                placeholder="Senha"
-                className={errors?.password && "input-error"}
-                {...register("password", {required: true, minLength: 10})}
-              />
-              {errors?.password?.type === "required" && <p className="error-message"> Password is required</p>}
-              {errors?.password?.type === "minLength" && <p className="error-message"> Password must have at least 10 characters </p>}
-              <button onClick = {(e) => 
-                {
-                  e.preventDefault()
-                  handleSubmit(sendForm)()
+              <Controller
+                name="email"
+                control = {control}
+                defaultValue=""
+                rules = {{required: "Email is required"}}
+                render = {({ field}) =>
+                  <StyledTextField
+                    {...field}
+                    type="text"
+                    placeholder = "E-mail"
+                    label= "E-mail"
+                    variant = "outlined"
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
                 }
-                }>ENTRAR</button>
+              />
+              <Controller
+                name="password"
+                control = {control}
+                defaultValue=""
+                rules={{required: "Password is required", minLength: {value:10, message: "Password must have at least 10 characters"}}}
+                render = {({ field}) =>
+                  <StyledTextField
+                    {...field}
+                    type="password"
+                    placeholder = "Senha"
+                    label= "Senha"
+                    variant = "outlined"
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                  />
+                }
+              />
+              <Button 
+                onClick = {(e) => 
+                  {
+                    e.preventDefault()
+                    handleSubmit(sendForm)()
+                  }
+                }
+                variant="contained"
+                color="success"
+              >
+                ENTRAR
+              </Button>
 
             </Form>
             <Link to="/signUp">
@@ -60,6 +92,16 @@ function SignIn() {
   )
 }
 
+const Logo =  styled.div` 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  margin-bottom: 20px; 
+  img { 
+    //width: 150px; // Ajuste conforme necessário 
+    height: auto; 
+  } 
+`
 const Container = styled.div `
   background-color: #e7dbc3;
   width: 100vw;

@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import UserContext from "./UserContext";
 import axios from "axios";
 import styled from "styled-components";
+import LockIcon from '@mui/icons-material/Lock';
+import { Badge } from "@mui/material";
+import Stack from '@mui/material/Stack';
 
 const categorias = [
     {"wifis":[
@@ -72,22 +75,21 @@ function HomePage() {
     return (
         <>
             <Container>
-                {categorias.map(categoria => {return (
-                    <>
-                    {
-                        <Categoria onClick={()=> handleClick(categoria, passwords[categoria.name])}> 
-                        <div> {categoria.name} </div>
-                        <div className="qtd">
-                            <p>
-                                {passwords[categoria.name] && passwords[categoria.name].length > 0 ? passwords[categoria.name].length : 0}
-                            </p>
-                        </div>
-                        </Categoria> 
-                    }
 
-                    </>
-                )
-                })}
+                    {categorias.map(categoria => {return (
+                        <>
+                        {
+                            <Categoria onClick={()=> handleClick(categoria, passwords[categoria.name])}>
+                            <div> {categoria.name} </div>
+                            <Badge badgeContent={passwords[categoria.name]?.length} color="error" showZero>
+                                <LockIcon color="primary" />
+                            </Badge>
+                            </Categoria> 
+                        }
+
+                        </>
+                    )
+                    })}
             </Container>
         </>
     )
@@ -104,7 +106,6 @@ const Container = styled.div `
 `
 
 const Categoria = styled.div `
-    outline: 1px solid rgb(255, 72, 72);
     width: 25vw;
     height: 40px;
     margin-top: 20px;
@@ -112,6 +113,8 @@ const Categoria = styled.div `
     justify-content: space-between;
     align-items: center;
     padding: 10px;
+    background-color: white;
+    font-family: "Josefin Sans", sans-serif;
     .qtd:hover{
         background-color: pink;
     }
