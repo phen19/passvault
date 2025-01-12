@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import UserContext from "./UserContext";
+import { useUserData } from "./UserContext";
 
 function Passwords() {
-    const {user} = useContext(UserContext);
+    const [userData, setUserData] = useUserData();
     const location = useLocation()
     const config = {
         headers: {
-            Authorization: `Bearer ${user.token}`
+            Authorization: `Bearer ${userData.token}`
         }
     }
     const navigate = useNavigate()

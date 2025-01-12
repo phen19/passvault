@@ -1,22 +1,23 @@
 import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import UserContext from "./UserContext";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
+import { useUserData } from "./UserContext";
+import API from "./constant";
 
 function AddNewPassword() {
-    const {user} = useContext(UserContext);
+    const [userData, setUserData] = useUserData();
     const location = useLocation()
     const navigate = useNavigate();
     const {register, handleSubmit, formState: {errors}} = useForm();
     const config = {
         headers: {
-            Authorization: `Bearer ${user.token}`
+            Authorization: `Bearer ${userData.token}`
         }
     }
     function sendForm(data){
-        const request = axios.post("http://localhost:5000/" + location.state.categoria.name.toLowerCase(),data, config);
+        const request = axios.post(`${API}/${location.state.categoria.name.toLowerCase()}`, data, config);
         request.then((response) =>{
             navigate('/homePage')
         })

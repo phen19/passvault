@@ -1,21 +1,23 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import UserContext from "./UserContext";
 import axios from "axios";
+import API from "./constant";
+import { useUserData } from "./UserContext";
+
 function Password() {
     const [password, setPassword] = useState([]);
-    const {user} = useContext(UserContext);
+    const [userData, setUserData] = useUserData();
     const location = useLocation()
     const {passwordId} = useParams();
     const navigate = useNavigate();
     const config = {
         headers: {
-            Authorization: `Bearer ${user.token}`
+            Authorization: `Bearer ${userData.token}`
         }
     }
     useEffect(() =>{
         console.log(location.state)
-        const request = axios.get("http://localhost:5000/" + location.state.categoria.name.toLowerCase() + "/" + passwordId ,config);
+        const request = axios.get(`${API}/${location.state.categoria.name.toLowerCase()}/${passwordId}`, config);
 
         request.then((response) => {
             setPassword(response.data)
@@ -27,7 +29,7 @@ function Password() {
     function deletePassword(id){
         const confirm = window.confirm("Tem certeza que deseja excluir este link?"); 
         if(confirm){
-            const request = axios.delete("http://localhost:5000/" + location.state.categoria.name.toLowerCase() + "/" + id, config);
+            const request = axios.delete(`${API}/${location.state.categoria.name.toLowerCase()}/${id}`, config);
             request.then(response => {
                 navigate("/homePage")
             });

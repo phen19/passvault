@@ -1,12 +1,11 @@
 import { useContext, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import UserContext from "./UserContext";
 import axios from "axios";
 import styled from "styled-components";
 import LockIcon from '@mui/icons-material/Lock';
 import { Badge } from "@mui/material";
-import Stack from '@mui/material/Stack';
-
+import { useUserData } from "./UserContext";
+import API from "./constant";
 const categorias = [
     {"wifis":[
         {"fieldName": "networkName", "fieldType": "text", "label": "Nome da Rede"},
@@ -44,23 +43,22 @@ const categorias = [
     ],"name":"Notes", "id": 5}
 ];
 function HomePage() {
-    const {user} = useContext(UserContext);
+    const [userData, setUserData] = useUserData();
     const config = useMemo(() => ({ 
         headers: { 
-            Authorization: `Bearer ${user.token}` 
+            Authorization: `Bearer ${userData.token}` 
         } 
-    }), [user.token]); 
+    }), [userData.token]); 
     
     const [passwords, setPasswords] = useState({});
 
     useEffect(() =>{
         categorias.forEach(categoria => {
 
-            const request = axios.get("http://localhost:5000/" + categoria.name.toLowerCase(),config);
+            const request = axios.get(`${API}/${categoria.name.toLowerCase()}` , config);
     
             request.then((response) => {
                 setPasswords(prevPasswords => ({ ...prevPasswords, [categoria.name]:response.data}))
-                console.log(response.data)
             }).catch((err => {
                 console.error(err)
             }))
@@ -76,10 +74,10 @@ function HomePage() {
         <>
             <Container>
 
-                    {categorias.map(categoria => {return (
+                    {categorias.map((categoria,idx) => {return (
                         <>
                         {
-                            <Categoria onClick={()=> handleClick(categoria, passwords[categoria.name])}>
+                            <Categoria id={idx} onClick={()=> handleClick(categoria, passwords[categoria.name])}>
                             <div> {categoria.name} </div>
                             <Badge badgeContent={passwords[categoria.name]?.length} color="error" showZero>
                                 <LockIcon color="primary" />
