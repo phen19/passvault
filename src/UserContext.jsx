@@ -6,10 +6,10 @@ const USER_DATA = "user_data";
 
 function UserDataProvider(props){
     const [userData, setUserData] = useState(
-        () => JSON.parse(window.localStorage.getItem(USER_DATA)) || null
+        () => JSON.parse(window?.localStorage?.getItem(USER_DATA)) || null
     );
     useEffect(() => { 
-        window.localStorage.setItem(USER_DATA, JSON.stringify(userData)); 
+        window?.localStorage?.setItem(USER_DATA, JSON.stringify(userData)); 
     }, [userData]);
 
     return (
@@ -18,11 +18,11 @@ function UserDataProvider(props){
 }
 
 function saveUserDataInLocalStorage(userData){
-    window.localStorage.setItem(USER_DATA, JSON.stringify(userData));
+    window?.localStorage?.setItem(USER_DATA, JSON.stringify(userData));
 }
 
 function deleteUserDataInLocalStorage(userData){
-    window.localStorage.removeItem(USER_DATA);
+    window?.localStorage?.removeItem(USER_DATA);
 }
 
 function useUserData(){

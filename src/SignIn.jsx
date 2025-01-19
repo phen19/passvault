@@ -1,72 +1,32 @@
-import { Link } from "react-router-dom";
 import { useUserData, saveUserDataInLocalStorage } from "./UserContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import styled from "styled-components";
 import { Controller, useForm } from "react-hook-form";
-import TextField from "@mui/material/TextField";
-import { Button } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { styled as muiStyled } from "@mui/system";
-import logo from './assets/log.png';
-import API from "./constant";
+import {API} from "./constant";
+import Header from "./Header";
+import {useState} from "react";
+import  {ThreeDots}  from  'react-loader-spinner'
+import { Container, Form } from "./assets/Styled";
 
 const StyledTextField = muiStyled(TextField)({
   marginBottom: '16px',
 });
 
-const Logo = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  img {
-    height: auto;
-  }
-`;
-
-const Container = styled.div`
-  background-color: #e7dbc3;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  margin: 0 2vw 0 2vw;
-  align-items: center;
-
-  input {
-    width: 350px;
-  }
-
-  button {
-    width: 350px;
-  }
-
-  .input-error {
-    outline: 1px solid rgb(255, 72, 72);
-  }
-
-  .error-message {
-    color: rgb(255, 72, 72);
-  }
-  margin-bottom: 16px;
-`;
-
 function SignIn() {
   const [, setUserData] = useUserData();
   const { control, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
+  let loadingAnimation = <ThreeDots color="#FFFFFF" height={45} width={60} />
   function sendForm(data) {
+    setLoading(true);
     const request = axios.post(`${API}/signIn`, data);
     request.then((response) => {
       setUserData(response.data);
       saveUserDataInLocalStorage(response.data);
+      setLoading(false);
       navigate("/homePage");
     });
     request.catch((error) => {
@@ -76,9 +36,7 @@ function SignIn() {
 
   return (
     <Container>
-      <Logo>
-        <img src={logo} alt="PASSVAULT Logo" />
-      </Logo>
+      <Header />
       <Form onSubmit={handleSubmit(sendForm)}>
         <Controller
           name="email"
@@ -115,7 +73,7 @@ function SignIn() {
           }
         />
         <Button type="submit" variant="contained" color="success">
-          ENTRAR
+          {loading ? loadingAnimation : 'ENTRAR'}
         </Button>
       </Form>
       <Link to="/signUp">

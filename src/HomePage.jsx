@@ -1,135 +1,103 @@
-import { useContext, useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import styled from "styled-components";
 import LockIcon from '@mui/icons-material/Lock';
-import { Badge } from "@mui/material";
+import { Badge, Box, Paper, Stack } from "@mui/material";
 import { useUserData } from "./UserContext";
-import API from "./constant";
-const categorias = [
-    {"wifis":[
-        {"fieldName": "networkName", "fieldType": "text", "label": "Nome da Rede"},
-        {"fieldName":"title", "fieldType": "text", "label": "Título"},
-        {"fieldName": "password", "fieldType":"text", "label": "Senha"}
-    ], "name": "Wifis", "id": 1},
-    {"credentials":
-        [
-            {"fieldName": "url", "fieldType": "text", "label": "URL"},
-            {"fieldName": "title", "fieldType": "text", "label": "Título"},
-            {"fieldName": "username", "fieldType": "text", "label": "Nome de usuário" },
-            {"fieldName": "password", "fieldType": "text", "label": "Senha"}
-        ], "name": "Credentials", "id": 2}, 
-    {"cards": [
-        {"fieldName": "title", "fieldType": "text", "label": "Nome do Cartão"},
-        {"fieldName": "cardHolderName", "fieldType": "text", "label": "Titular do Cartão"},
-        {"fieldName": "number", "fieldType": "number", "label": "Número do Cartão"},
-        {"fieldName": "securityCode", "fieldType": "number", "label": "Código de Segurança"},
-        {"fieldName": "expireDate", "fieldType": "date", "label": "Data de Expiração"},
-        {"fieldName": "password", "fieldType": "text", "label": "Senha"},
-        {"fieldName": "isVirtual", "fieldType": "checkbox", "label": "É virtual?"},
-        {"fieldName": "type", "fieldType": "select", "label": "Tipo do cartão"}
-    ], "name":"Cards", "id": 3}, 
-    {"documents":[
-        {"fieldName": "fullName", "fieldType": "text", "label": "Nome Completo"},
-        {"fieldName": "type", "fieldType": "select", "label": "Tipo do Documento"},
-        {"fieldName": "emissionDate", "fieldType": "date", "label": "Data de Emissão"},
-        {"fieldName": "expireDate", "fieldType": "date", "label": "Data de Expiração"},
-        {"fieldName": "number", "fieldType": "number", "label": "Número do Documento"},
-        {"fieldName": "issuer", "fieldType": "text", "label": "Emissor"},
-    ], "name": "Documents", "id": 4},
-    {"notes": [
-        {"fieldName": "title", "fieldType": "text", "label": "Nome"},
-        {"fieldName": "note", "fieldType": "text", "label": "Nota"},
-    ],"name":"Notes", "id": 5}
-];
+import {API, categorias} from "./constant";
+import Header from "./Header";
+import {styled as muiStyled} from "@mui/system"
+import  {TailSpin}  from  'react-loader-spinner'
+import { Container } from "./assets/Styled";
+
+const Item = muiStyled(Paper)(({ theme }) => ({
+    backgroundColor: '#fff',
+    ...theme?.typography?.body2,
+    padding: theme?.spacing(1),
+    textAlign: 'center',
+    color: theme?.palette?.text?.secondary,
+    ...theme.applyStyles('dark', {
+        backgroundColor: '#1A2027'
+    }),
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+    ":hover":{
+        backgroundColor: '#4fa94d',
+        cursor: 'pointer'
+    }
+}));
+
+const StyledBadge = muiStyled(Badge)(({ theme }) => ({
+    '& .MuiBadge-badge': {
+    right: -3,
+    top: 13,
+    border: `2px solid ${theme?.palette?.background?.paper}`,
+    padding: '0 4px',
+    },
+}));
+
 function HomePage() {
     const [userData, setUserData] = useUserData();
     const config = useMemo(() => ({ 
         headers: { 
             Authorization: `Bearer ${userData.token}` 
-        } 
+        },
+        timeout: 10000
     }), [userData.token]); 
     
     const [passwords, setPasswords] = useState({});
-
+    const [loading, setLoading] = useState(false);
+    let loadingAnimation = <TailSpin color="#4fa94d" height={45} width={60} />
+    
     useEffect(() =>{
         categorias.forEach(categoria => {
-
+            setLoading(true);
             const request = axios.get(`${API}/${categoria.name.toLowerCase()}` , config);
-    
             request.then((response) => {
                 setPasswords(prevPasswords => ({ ...prevPasswords, [categoria.name]:response.data}))
+                setLoading(false);
             }).catch((err => {
-                console.error(err)
+                if(err.code === 'ECONNABORTED'){
+                    console.error('Timeout')
+                }else {
+                    console.error(err)
+                }
             }))
         })
     }, [categorias, config])
 
     const navigate = useNavigate();
+
     function handleClick(categoria, passwords){
-        console.log({categoria, passwords})
         navigate('/passwords', {state:{categoria, passwords}})
+    }
+
+    function renderPasswordsCategories(){
+        return (
+                <Stack spacing={2}>
+                    {categorias.map((categoria,idx) => {return (
+                        <Item sx={{width: "25vw", paddingRight: '20px'}}key={idx} onClick={()=> handleClick(categoria, passwords[categoria.name])}>
+                        <div key={idx}> {categoria.name} </div>
+                            <StyledBadge badgeContent={passwords[categoria.name]?.length} color='secondary' showZero>
+                                <LockIcon color="primary" />
+                            </StyledBadge>
+                        </Item> 
+                    )})}
+                </Stack>
+        )
     }
     return (
         <>
             <Container>
-
-                    {categorias.map((categoria,idx) => {return (
-                        <>
-                        {
-                            <Categoria id={idx} onClick={()=> handleClick(categoria, passwords[categoria.name])}>
-                            <div> {categoria.name} </div>
-                            <Badge badgeContent={passwords[categoria.name]?.length} color="error" showZero>
-                                <LockIcon color="primary" />
-                            </Badge>
-                            </Categoria> 
-                        }
-
-                        </>
-                    )
-                    })}
+                <Header />
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', paddingTop: 5 }}>
+                    {loading ? loadingAnimation : renderPasswordsCategories()}
+                </Box>
             </Container>
         </>
     )
 }
-
-const Container = styled.div `
-  background-color: #e7dbc3;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 100px
-`
-
-const Categoria = styled.div `
-    width: 25vw;
-    height: 40px;
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: white;
-    font-family: "Josefin Sans", sans-serif;
-    .qtd:hover{
-        background-color: pink;
-    }
-
-    .qtd{
-        background-color: blue;
-        width: 30px;
-        height: 30px;
-        color: red;
-        border-radius: 50%;
-        display:flex;
-        align-items:center;
-        justify-content: center;
-    }
-`
-
-
 
 export default HomePage
   

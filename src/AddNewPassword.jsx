@@ -1,88 +1,113 @@
-import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useForm } from "react-hook-form";
-import styled from "styled-components";
+import { Controller, useForm } from "react-hook-form";
 import { useUserData } from "./UserContext";
-import API from "./constant";
+import {API} from "./constant";
+import {styled as muiStyled, width} from "@mui/system"
+import { Button, MenuItem, TextField, Select, InputLabel, FormHelperText, Checkbox, FormControlLabel } from "@mui/material";
+import Header from "./Header";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Container, Form } from "./assets/Styled";
+const StyledTextField = muiStyled(TextField)({
+    marginBottom: '16px',
+  })
+const StyledSelect = muiStyled(Select)({
+    marginBottom: '16px',
+})
 
 function AddNewPassword() {
-    const [userData, setUserData] = useUserData();
+    const [userData] = useUserData();
     const location = useLocation()
     const navigate = useNavigate();
-    const {register, handleSubmit, formState: {errors}} = useForm();
+    const {control, register, handleSubmit, formState: {errors}} = useForm();
     const config = {
         headers: {
             Authorization: `Bearer ${userData.token}`
         }
     }
+
     function sendForm(data){
-        const request = axios.post(`${API}/${location.state.categoria.name.toLowerCase()}`, data, config);
+        const request = axios.post(`${API}/${location?.state?.categoria?.name.toLowerCase()}`, data, config);
         request.then((response) =>{
             navigate('/homePage')
         })
         request.catch((error) => {alert(error.response.data)})
     }
 
-    function getfields(field){
+    function getfields(field, index){
+        let campo = field;
         if(field.fieldType === "number"){
-            if(location.state.categoria.name.toLowerCase() === "cards"){
+            if(location?.state?.categoria?.name.toLowerCase() === "cards"){
                 if(field.fieldName === "number"){
                     return  <>
-                                <label>{field.label}</label>
-                                <input
+                                <Controller
+                                    key={index}
+                                    name={campo.fieldName}
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{ required: `${campo.label} is required`, validate: {pattern: value => /^\d+$/.test(value) || 'Card number must be numeric', length: value => value.length === 16 || 'Card number must have exactly 16 digits'}}}
+                                    render={({ field }) =>
+                                        <StyledTextField
+                                            {...field}
                                             type="text"
-                                            id={field.fieldName}
-                                            placeholder={field.fieldName}
-                                            name={field.fieldName}
-                                            className={errors?.[field.fieldName] && "input-error"}
-                                            {...register(field.fieldName, {required: true, validate: (value)=> {
-                                                let pattern = /^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$/;
-                                                return pattern.test(value)
-                                            }})}
-                                        >
-                                </input>
-                                {errors?.[field.fieldName]?.type === "required" && <p className="error-message"> {field.fieldName} é obrigatório</p>}
-                                {errors?.[field.fieldName]?.type === "validate" && <p className="error-message"> {field.label} deve seguir o formato ####-####-####-####</p>}
+                                            placeholder={campo.label}
+                                            label={campo.label}
+                                            variant="outlined"
+                                            error={!!errors[campo.fieldName]}
+                                            helperText={errors[campo.fieldName]?.message}
+                                        />
+                                    }
+                                />
                             </>
                 }
                 if(field.fieldName === "securityCode"){
                     return  <>
-                                <label>{field.label}</label>
-                                <input
+                                <Controller
+                                    key={index}
+                                    name={campo.label}
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{ 
+                                        required: `${campo.label} é obrigatório`, 
+                                        validate: { pattern: value => /^\d+$/.test(value) || 'Security code must be numeric' ,
+                                                    length: value => value.length === 3 || 'Security code must have exactly 3 digits'}}}
+                                    render={({ field }) =>
+                                        <StyledTextField
+                                            {...field}
                                             type="text"
-                                            id={field.fieldName}
-                                            placeholder={field.fieldName}
-                                            name={field.fieldName}
-                                            className={errors?.[field.fieldName] && "input-error"}
-                                            {...register(field.fieldName, {required: true, minLength: 3, maxLength:3 ,validate: (value)=> {
-                                                let pattern = /^\d+$/;
-                                                return pattern.test(value)
-                                            }})}
-                                        >
-                                </input>
-                                {errors?.[field.fieldName]?.type === "required" && <p className="error-message"> {field.label} é obrigatório</p>}
-                                {errors?.[field.fieldName]?.type === "validate" && <p className="error-message"> {field.label} deve conter apenas números</p>}
-                                {errors?.[field.fieldName]?.type === "minLength" && <p className="error-message"> {field.label} deve conter 3 dígitos</p>}
-                                {errors?.[field.fieldName]?.type === "maxLength" && <p className="error-message"> {field.label} deve conter 3 dígitos</p>}
+                                            placeholder={campo.label}
+                                            label={campo.label}
+                                            variant="outlined"
+                                            error={!!errors[campo.label]}
+                                            helperText={errors[campo.label]?.message}
+                                        />
+                                    }
+                                />
                             </>
                 }
             }
             if(location.state.categoria.name.toLowerCase() === "documents"){
                 if(field.fieldName === "number"){
                     return  <> 
-                                
-                                    <label>{field.label}</label>
-                                    <input
-                                                type="text"
-                                                id={field.fieldName}
-                                                placeholder={field.fieldName}
-                                                name={field.fieldName}
-                                                className={errors?.[field.fieldName] && "input-error"}
-                                                {...register(field.fieldName, {required: true})}
-                                            >
-                                    </input>
-                                {errors?.[field.fieldName]?.type === "required" && <p className="error-message"> {field.label} é obrigatório</p>}
+                                <Controller
+                                    key={index}
+                                    name={campo.fieldName}
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{ required: `${campo.label} is required`, validate: {pattern: value => /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(value) || `${campo.label} deve ser no formato DD/MM/AAAA`}}}
+
+                                    render={({ field }) =>
+                                        <StyledTextField
+                                            {...field}
+                                            type="text"
+                                            placeholder={campo.label}
+                                            label={campo.label}
+                                            variant="outlined"
+                                            error={!!errors[campo.label]}
+                                            helperText={errors[campo.label]?.message}
+                                        />
+                                    }
+                                />
                             </>
                 }
             }
@@ -90,40 +115,76 @@ function AddNewPassword() {
 
         if(field.fieldType === "select"){
 
-            if(location.state.categoria.name.toLowerCase() === "cards"){
+            if(location?.state?.categoria?.name.toLowerCase() === "cards"){
                 if(field.fieldName === "type"){
                     return  <>
-                                <label>{field.label}</label>
-                                <select
-                                    id={field.fieldName}
-                                    name={field.fieldName}
-                                    className={errors?.[field.fieldName] && "input-error"}
-                                    {...register(field.fieldName, {required: true})}
-                                >
-                                    <option value = ""> Select type of card..</option>
-                                    <option value = "credit"> Credit</option>
-                                    <option value = "debit"> Debit</option>
-                                    <option value = "both"> Both</option>
-                                </select>
-                                {errors?.[field.fieldName]?.type === "required" && <p className="error-message"> {field.label} é obrigatório</p>}
+                                <Controller
+                                    key={index}
+                                    name={campo.fieldName}
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{required: `${campo.label} is required`}}
+                                    render={({ field }) =>
+                                        <>
+                                        <InputLabel variant="standard" id={`select-label-${index}`}>{campo.label}</InputLabel>
+                                        <StyledSelect
+                                            {...field}
+                                            type={campo.fieldType}
+                                            id={`select-${index}`}
+                                            labelId={`select-label-${index}`}
+                                            label={campo.label}
+                                            variant="outlined"
+                                            error={!!errors[campo.fieldName]}
+                                            helperText={errors[campo.fieldName]?.message}
+                                            sx={{width: "440px"}}
+
+                                        >
+                                            <MenuItem value = "credit"> Credit</MenuItem>
+                                            <MenuItem value = "debit"> Debit</MenuItem>
+                                            <MenuItem value = "both"> Both</MenuItem>
+                                        </StyledSelect>
+                                        {errors[campo.label] && (
+                                            <FormHelperText error>{errors[campo.fieldName]?.message}</FormHelperText>
+                                        )}
+                                        </>
+                                    }
+                                />
                             </>
                 }
             }
             if(location.state.categoria.name.toLowerCase() === "documents"){
                 if(field.fieldName === "type"){
                     return  <>
-                                <label>{field.label}</label>
-                                <select
-                                    id={field.fieldName}
-                                    name={field.fieldName}
-                                    className={errors?.[field.fieldName] && "input-error"}
-                                    {...register(field.fieldName, {required: true})}
-                                >
-                                    <option value = ""> Select type of document..</option>
-                                    <option value = "RG"> RG</option>
-                                    <option value = "CNH"> CNH</option>
-                                </select>
-                                {errors?.[field.fieldName]?.type === "required" && <p className="error-message"> {field.fieldName} é obrigatório</p>}
+                            <Controller
+                                    key={index}
+                                    name={campo.fieldName}
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{required: `${campo.label} is required`}}
+                                    render={({ field }) =>
+                                        <>
+                                        <InputLabel variant="standard" id={`select-label-${index}`}>{campo.label}</InputLabel>
+                                        <StyledSelect
+                                            {...field}
+                                            type={campo.fieldType}
+                                            id={`select-${index}`}
+                                            labelId={`select-label-${index}`}
+                                            label={campo.label}
+                                            variant="outlined"
+                                            error={!!errors[campo.fieldName]}
+                                            helperText={errors[campo.fieldName]?.message}
+                                            sx={{width: "440px"}}
+
+                                        >
+                                            <MenuItem value = "RG"> RG</MenuItem>
+                                            <MenuItem value = "CNH"> CNH</MenuItem>
+                                        </StyledSelect>
+                                        {errors[campo.label] && (
+                                            <FormHelperText error>{errors[campo.fieldName]?.message}</FormHelperText>
+                                        )}
+                                        </>
+                                    }
+                                />
                             </>
                 }
             }
@@ -132,13 +193,24 @@ function AddNewPassword() {
 
         if(field.fieldType === "checkbox"){
             return <>  
-                    <label>{field.label}</label>
-                    <input 
-                        type={field.fieldType}
-                        id={field.fieldName}
-                        placeholder={field.fieldName}
-                        name={field.fieldName}
-                        {...register(field.fieldName)}
+                    
+                    <FormControlLabel 
+                        control={
+                            <Controller
+                                key={index}
+                                name={campo.fieldName}
+                                control={control}
+                                defaultValue={false}
+                                rules={{required: `${campo.label} is required`}}
+                                render={({ field }) =>
+                                    <Checkbox
+                                        {...field}
+                                        checked={field.value}
+                                    />
+                                }
+                            />
+                        } 
+                        label={campo.label} 
                     />
                 </>
         }
@@ -147,122 +219,96 @@ function AddNewPassword() {
             if(location.state.categoria.name.toLowerCase() === "cards"){
                 if(field.fieldName === "expireDate"){
                     return  <>
-                                <label>{field.label}</label>
-                                <input
+                                <Controller
+                                    key={index}
+                                    name={campo.fieldName}
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{ required: `${campo.label} is required`, validate: {pattern: value => /^[0-9]{2}\/[0-9]{2}$/.test(value) || 'Data de Expiração deve ser no formato MM/AA'}}}
+
+                                    render={({ field }) =>
+                                        <StyledTextField
+                                            {...field}
                                             type="text"
-                                            id={field.fieldName}
-                                            placeholder={field.fieldName}
-                                            name={field.fieldName}
-                                            className={errors?.[field.fieldName] && "input-error"}
-                                            {...register(field.fieldName, {required: true, validate: (value)=> {
-                                                let pattern = /^[0-9]{2}\/[0-9]{2}$/;
-                                                return pattern.test(value)
-                                            }})}
-                                        >
-                                </input>
-                                {errors?.[field.fieldName]?.type === "required" && <p className="error-message"> {field.fieldName} é obrigatório</p>}
-                                {errors?.[field.fieldName]?.type === "validate" && <p className="error-message"> Data de Expiração deve ser no formato MM/AA</p>}
+                                            placeholder={campo.label}
+                                            label={campo.label}
+                                            variant="outlined"
+                                            error={!!errors[campo.fieldName]}
+                                            helperText={errors[campo.fieldName]?.message}
+                                        />
+                                    }
+                                />
                             </>
                 }
             }
 
             if(location.state.categoria.name.toLowerCase() === "documents"){
                 return  <>
-                            <label>{field.label}</label>
-                            <input
-                                        type="text"
-                                        id={field.fieldName}
-                                        placeholder={field.fieldName}
-                                        name={field.fieldName}
-                                        className={errors?.[field.fieldName] && "input-error"}
-                                        {...register(field.fieldName, {required: true, validate: (value)=> {
-                                            let pattern = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/;
-                                            return pattern.test(value)
-                                        }})}
-                                    >
-                            </input>
-                            {errors?.[field.fieldName]?.type === "required" && <p className="error-message"> {field.label} é obrigatório</p>}
-                            {errors?.[field.fieldName]?.type === "validate" && <p className="error-message"> {field.label} deve ser no formato DD/MM/AAAA</p>}
+                            <Controller
+                                    key={index}
+                                    name={campo.fieldName}
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{ required: `${campo.label} is required`, validate: {pattern: value => /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(value) || `${campo.label} deve ser no formato DD/MM/AAAA`}}}
+
+                                    render={({ field }) =>
+                                        <StyledTextField
+                                            {...field}
+                                            type="text"
+                                            placeholder={campo.label}
+                                            label={campo.label}
+                                            variant="outlined"
+                                            error={!!errors[campo.fieldName]}
+                                            helperText={errors[campo.fieldName]?.message}
+                                        />
+                                    }
+                                />
                         </>
             }
         }
         return  <>  
-                    <label>{field.label}</label>
-                    <input 
-                        type={field.fieldType}
-                        id={field.fieldName}
-                        placeholder={field.fieldName}
-                        name={field.fieldName}
-                        className={errors?.[field.fieldName] && "input-error"}
-                        {...register(field.fieldName, {required: true})}
+                    <Controller
+                        key={index}
+                        name={campo.fieldName}
+                        control={control}
+                        defaultValue=""
+                        rules={{required: `${campo.label} is required`}}
+                        render={({ field }) =>
+                            <StyledTextField
+                                {...field}
+                                type={campo.fieldType}
+                                placeholder={campo.label}
+                                label={campo.label}
+                                variant="outlined"
+                                error={!!errors[campo.fieldName]}
+                                helperText={errors[campo.fieldName]?.message}
+                            />
+                        }
                     />
-                    {errors?.[field.fieldName]?.type === "required" && <p className="error-message"> {field.label} é obrigatório</p>}
                 </>
+
+                
     }
     return (
         <>
-
+            
             <Container>
-            <div className = "logo">
-                PASSVAULT 🔏
-            </div>
-                <Form>
-                    {location.state.categoria[location.state.categoria.name.toLowerCase()].map((field) => (    
-                            getfields(field)
+            <Header />
+                <Form onSubmit={handleSubmit(sendForm)}> 
+                    {location?.state?.categoria[location.state.categoria.name.toLowerCase()].map((field, index) => (    
+                            getfields(field, index)
                     ))}
-                    <button onClick={(e) => {
-                        e.preventDefault()
-                        handleSubmit(sendForm)()
-                    }}>
+                    <Button type="submit" variant="contained" color="success">
                         CADASTRAR
-                    </button>
+                    </Button>
                 </Form>
+                <Button variant="contained" color="error" onClick={()=> navigate(-1)} sx={{width: "350px", marginTop: "10px"}}>
+                    <ArrowBackIcon/> VOLTAR
+                </Button>
             </Container>
             
         </>
     )
 }
-
-const Container = styled.div `
-  background-color: #e7dbc3;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
-const Form = styled.form `
-  display: flex;
-  flex-direction: column;
-  margin: 0 2vw 0 2vw;
-  align-items: center;
-
-  input{
-    width: 350px;
-    margin: 0 2vw 0 2vw;
-    }
-
-  .campo{
-    display:flex;
-    flex-wrap: wrap;
-  }
-  
-  button{
-    margin-top: 10px;
-    width: 350px;
-  }
-
-  select{
-    width: 350px;
-  }
-
-  .input-error{
-    outline: 1px solid rgb(255, 72, 72);
-  }
-  
-  .error-message{
-    color: rgb(255, 72, 72)
-  }
-`
 
 export default AddNewPassword

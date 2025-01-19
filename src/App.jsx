@@ -21,7 +21,6 @@ function App() {
             <Route path= "/passwords" element={<Passwords/>}/>
             <Route path= "/password/:category/:passwordId" element={<Password/>}/>
             <Route path= "/addNewPassword" element={<AddNewPassword/>}/>
-            
           </Routes>
         </UserDataProvider>
       </BrowserRouter>
