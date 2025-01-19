@@ -77,7 +77,7 @@ function HomePage() {
         return (
                 <Stack spacing={2}>
                     {categorias.map((categoria,idx) => {return (
-                        <Item sx={{width: "25vw", paddingRight: '20px'}}key={idx} onClick={()=> handleClick(categoria, passwords[categoria.name])}>
+                        <Item sx={{width: "350px", paddingRight: '20px'}}key={idx} onClick={()=> handleClick(categoria, passwords[categoria.name])}>
                         <div key={idx}> {categoria.name} </div>
                             <StyledBadge badgeContent={passwords[categoria.name]?.length} color='secondary' showZero>
                                 <LockIcon color="primary" />

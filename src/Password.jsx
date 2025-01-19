@@ -72,7 +72,7 @@ function Password() {
             let keys = location.state.categoria[location.state.categoria.name.toLowerCase()]
             return(
                 <>
-                <Item sx={{width: "25vw", display: "flex", textAlign: "left", justifyContent: "space-between", alignItems: "center"}}>
+                <Item sx={{width: "350px", display: "flex", textAlign: "left", justifyContent: "space-between", alignItems: "center"}}>
                     <div id={password.id} style={{display: "flex", alignItems: "center", width: "100%", color: "#605e5a"}}>
                         <div>
                             {keys.map(key => {

@@ -46,7 +46,7 @@ function Passwords() {
         if(location.state && location.state.passwords && location.state.passwords.length > 0){
             return location.state.passwords.map(password => {
                 return(
-                    <Item sx={{width: "25vw", display: "flex", flexDirection: "column", textAlign: "left"}} key={password.id} onClick={()=> handleClick(password.id)}>
+                    <Item sx={{width: "350px", display: "flex", flexDirection: "column", textAlign: "left"}} key={password.id} onClick={()=> handleClick(password.id)}>
                         <div style={{display: "flex", alignItems: "center"}}>
                             <div>
                                 <p>Nome: </p>
@@ -60,7 +60,7 @@ function Passwords() {
             })
         }else if(location.state && location.state.passwords && location.state.passwords.length === 0){
             return(
-                <Item sx={{width: "25vw", display: "flex", flexDirection: "column", textAlign: "left"}}>
+                <Item sx={{width: "350px", display: "flex", flexDirection: "column", textAlign: "left"}}>
                     <div>
                         Nenhum item encontrado
                     </div>
@@ -81,7 +81,7 @@ function Passwords() {
                         </CategoryName>
                     <Stack spacing={2} marginBottom={"16px"} useFlexGap>
                         {renderPasswords()}
-                        <Box sx={{width: "25vw", display: "flex", textAlign: "center", justifyContent: "space-around"}}>
+                        <Box sx={{width: "350px", display: "flex", textAlign: "center", justifyContent: "space-around"}}>
                             <Buttons onClick={()=> navigateBack()}>
                                 <ArrowBack sx={{color: "#605e5a", fontSize: 40}}/> 
                             </Buttons>
