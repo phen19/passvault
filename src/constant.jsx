@@ -1,4 +1,4 @@
-const API = "http://localhost:5000";
+const API = "http://sophisticated-muire-projetospessoais-bf19be74.koyeb.app";
 
 const categorias = [
     {"wifis":[
